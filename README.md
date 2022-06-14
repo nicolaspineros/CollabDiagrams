@@ -9,7 +9,7 @@ CollabDiagrams es una plataforma que permite a los estudiantes crear y editar di
 
 ## Descripción
 
-![](imagenes/ejemplo.png)
+![](ejemplo.png)
 
 ## Historias de Usuario
 

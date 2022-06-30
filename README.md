@@ -1,7 +1,7 @@
 # CollabDiagrams
 
 ## Autor
-### Nicolas Piñeros Campo
+### Oscar Nicolas Piñeros Campo
 
 ## Heroku
 

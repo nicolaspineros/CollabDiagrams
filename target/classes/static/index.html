@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Collab Diagrams</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- modeler distro -->      
+    <script src="https://unpkg.com/bpmn-js@1.3.2/dist/bpmn-modeler.development.js"></script>
+    <!-- script src="https://unpkg.com/bpmn-js/dist/bpmn-navigated-viewer.production.min.js"></script-->    
+    <style>
+        #root {          
+          height:  1000px;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 12px;
+          margin: 0;
+          overflow: hidden;
+          padding: 0;
+        }
+    
+        .react-bpmn-diagram-container {
+          width: 100%;
+          height: 100%;
+        }
+      </style>
+      
+</head>
+
+<body>
+
+<div id="root"></div> 
+<link rel="stylesheet" href="https://unpkg.com/bpmn-js@9.2.2/dist/assets/diagram-js.css" />
+<link rel="stylesheet" href="https://unpkg.com/bpmn-js@9.2.2/dist/assets/bpmn-font/css/bpmn-embedded.css" /> 
+<!-- Load React. -->
+<!-- Note: when deploying, replace "development.js" with
+"production.min.js". -->
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+<!-- Load babel to translate JSX to js. -->
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js">
+</script>
+
+<!-- Load our React component. -->
+<script src="js/DiagramComponents.jsx" type="text/babel"></script>
+</body>
+
+</html>

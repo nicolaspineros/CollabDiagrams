@@ -14,7 +14,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.springframework.stereotype.Component;
 
 @Component
-@ServerEndpoint("/DiagService")
+@ServerEndpoint("/CollabService")
 public class DiagramsEndpoint {
     private static final Logger logger = Logger.getLogger(DiagramsEndpoint.class.getName());
     /* Queue for all open WebSocket sessions */
@@ -37,8 +37,8 @@ public class DiagramsEndpoint {
     }
 
     @OnMessage
-    public void processPoint(String message, Session session) {
-        System.out.println("Point received:" + message + ". From session: " +
+    public void processDiagram(String message, Session session) {
+        System.out.println("Diagram received:" + message + ". From session: " +
                 session);
         this.send(message);
     }

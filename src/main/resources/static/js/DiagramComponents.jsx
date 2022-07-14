@@ -4,9 +4,10 @@ class DiagramComponents extends React.Component {
     this.collabWS = new CollabConnection(CollabServiceURL(), (msg) => {
       //var obj = JSON.parse(msg);
       console.log("On func call back ", msg);
-      this.displayDiagram(msg);
+      this.displayDiagram(msg);      
     });
     this.state = {};
+    console.log(this.state);
     this.containerRef = React.createRef();
   }
 
@@ -17,6 +18,22 @@ class DiagramComponents extends React.Component {
 
     this.bpmnViewer = new BpmnJS({ container });
 
+    /*let element = bpmnViewer;
+    this.eventBus = this.bpmnJS.get("eventBus");
+    this.eventBus.on("element.click", function(event) {
+    element = {
+        id: event.element.id,
+        type: event.element.type
+    }
+    console.log(element);
+    });*/
+
+    const MyLoggingPlugin = (eventBus) => {
+        eventBus.on('element.changed', (event) => {
+          console.log('element ', event.element, ' changed');
+        });
+      }
+    
     this.bpmnViewer.on("import.done", (event) => {
       const { error, warnings } = event;
 
@@ -55,6 +72,10 @@ class DiagramComponents extends React.Component {
     const currentXML = props.diagramXML || state.diagramXML;
 
     const previousXML = prevProps.diagramXML || prevState.diagramXML;
+
+    console.log("previousXMl" + previousXML);
+    console.log("currentProps" + props.diagramXML);
+    console.log("prevState" + state.diagramXML);
 
     if (currentXML && currentXML !== previousXML) {
       console.log("UPDATE component" + currentXML);
@@ -149,6 +170,75 @@ class CollabConnection {
     this.wsocket.send(msg);
   }
 }
+
+class MyCustomPlugin {
+	
+	addIfNotExist (definition, varName, varDefault){
+		if(!definition.entries)
+			definition.entries = [];
+		
+		var entryExists = definition.entries.find( (item) => {return item.key === varName});
+		
+		if( !entryExists){
+			var moddleParams = {key: varName, $body: varDefault};
+			var newParameter = this.moddle.createAny('camunda:entry', 'http://camunda.org/schema/1.0/bpmn', moddleParams);
+			definition.get("entries").push(newParameter);
+		}
+	};
+	
+	getDoParameter(element){
+		try{
+			if(element.type === "bpmn:UserTask"){
+
+				var extensions = element.businessObject.extensionElements;
+				if(extensions && extensions.values){					
+					var inputOutputs = extensions.values.find((v) => { return v.$type === "camunda:InputOutput"; });
+
+					if(inputOutputs && inputOutputs.inputParameters){
+						var inputParameters = inputOutputs.inputParameters;
+						
+						var doParameter = inputParameters.find((i) => {return i.name === "DO"});
+						if(doParameter && doParameter.definition && doParameter.definition.$type === "camunda:Map"){
+							return doParameter;
+						}
+					}
+				}
+			}
+		}catch(e){
+			console.log(e);
+		}
+		return null;
+	}
+
+	constructor(eventBus, moddle) {
+		this.eventBus = eventBus;
+		this.moddle = moddle;
+
+		eventBus.on('propertiesPanel.changed', (event) => {
+			try{
+				var currentElement = event.current.element;
+				var doParameter = this.getDoParameter(currentElement);
+				if(doParameter){
+					// this is where I add new fields to map and fire the event
+					this.addIfNotExist(doParameter.definition, "isNextStepAsync", "false");
+					this.addIfNotExist(doParameter.definition, "textMessage", "");
+					this.addIfNotExist(doParameter.definition, "pageHeader", "");
+					this.addIfNotExist(doParameter.definition, "textType", "");
+					this.eventBus.fire('commandStack.changed', {element: currentElement});
+				}
+			}catch(e){
+				console.log(e);
+			}
+		});
+	}
+}
+
+MyCustomPlugin.$inject = [ 'eventBus' , 'moddle', 'canvas', 'commandStack']; 
+
+export default {
+  __init__: [ 'MyCustomPlugin' ],
+  MyCustomPlugin: [ 'type', MyCustomPlugin ]
+};
 
 ReactDOM.render(
   <DiagramComponents url="js/diagram.bpmn" />,

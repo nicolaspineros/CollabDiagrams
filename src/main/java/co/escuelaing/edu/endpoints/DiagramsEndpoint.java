@@ -17,17 +17,15 @@ import org.springframework.stereotype.Component;
 @ServerEndpoint("/CollabService")
 public class DiagramsEndpoint {
     private static final Logger logger = Logger.getLogger(DiagramsEndpoint.class.getName());
-    /* Queue for all open WebSocket sessions */
+    
     static Queue<Session> queue = new ConcurrentLinkedQueue<>();
     Session ownSession = null;
 
-    /* Call this method to send a message to all clients */
     public void send(String msg) {
         try {
-            /* Send updates to all open WebSocket sessions */
             for (Session session : queue) {
                 if (!session.equals(this.ownSession)) {
-                    session.getBasicRemote().sendText(msg);
+                    session.getBasicRemote().sendText(msg);                    
                 }
                 System.out.println("BACK"+msg);
                 logger.log(Level.INFO, "Sent: {0}", msg);
@@ -45,8 +43,7 @@ public class DiagramsEndpoint {
     }
 
     @OnOpen
-    public void openConnection(Session session) {
-        /* Register this connection in the queue */
+    public void openConnection(Session session) {        
         queue.add(session);
         ownSession = session;
         logger.log(Level.INFO, "Connection opened.");
@@ -58,15 +55,13 @@ public class DiagramsEndpoint {
     }
 
     @OnClose
-    public void closedConnection(Session session) {
-        /* Remove this connection from the queue */
+    public void closedConnection(Session session) {        
         queue.remove(session);
         logger.log(Level.INFO, "Connection closed.");
     }
 
     @OnError
     public void error(Session session, Throwable t) {
-        /* Remove this connection from the queue */
         queue.remove(session);
         logger.log(Level.INFO, t.toString());
         logger.log(Level.INFO, "Connection error.");

@@ -1,19 +1,17 @@
 class DiagramComponents extends React.Component {
   constructor(props) {
     super(props);
-    this.collabWS =
-            new CollabConnection(CollabServiceURL(),
-                (msg) => {
-                    var obj = JSON.parse(msg);
-                    console.log("On func call back ", msg);
-                    this.displayDiagram(obj);
-                });
-    this.state = {};    
+    this.collabWS = new CollabConnection(CollabServiceURL(), (msg) => {
+      //var obj = JSON.parse(msg);
+      console.log("On func call back ", msg);
+      this.displayDiagram(msg);
+    });
+    this.state = {};
     this.containerRef = React.createRef();
   }
 
   componentDidMount() {
-    const { url, diagramXML } = this.props;
+    const { url, diagramXML } = this.props;    
 
     const container = this.containerRef.current;
 
@@ -32,10 +30,12 @@ class DiagramComponents extends React.Component {
     });
 
     if (url) {
+        console.log("Paso url");
       return this.fetchDiagram(url);
     }
 
     if (diagramXML) {
+        console.log("Paso diagramXML");
       return this.displayDiagram(diagramXML);
     }
   }
@@ -45,9 +45,10 @@ class DiagramComponents extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { props, state } = this;
-
+    const { props, state } = this;    
     if (props.url !== prevProps.url) {
+      console.log("UPDATEurl" + currentXML);
+      this.collabWS.send(props.url);
       return this.fetchDiagram(props.url);
     }
 
@@ -56,13 +57,16 @@ class DiagramComponents extends React.Component {
     const previousXML = prevProps.diagramXML || prevState.diagramXML;
 
     if (currentXML && currentXML !== previousXML) {
+      console.log("UPDATE component" + currentXML);
+      this.collabWS.send(currentXML);
       return this.displayDiagram(currentXML);
     }
   }
 
   displayDiagram(diagramXML) {
+    //this.collabWS.send(diagramXML);
+    console.log("Uso displayDiagram")
     this.bpmnViewer.importXML(diagramXML);
-    this.collabWS.send(diagramXML);
   }
 
   fetchDiagram(url) {
@@ -72,6 +76,8 @@ class DiagramComponents extends React.Component {
       .then((response) => response.text())
       .then((text) => this.setState({ diagramXML: text }))
       .catch((err) => this.handleError(err));
+
+    console.log("uso fetch"+url);
   }
 
   handleLoading() {
@@ -110,7 +116,7 @@ class DiagramComponents extends React.Component {
 
 function CollabServiceURL() {
   var host = window.location.host;
-  var url = "wss://" + host + "/CollabService";
+  var url = "ws://" + host + "/CollabService";
   console.log("URL Calculada: " + url);
   return url;
 }
@@ -128,8 +134,9 @@ class CollabConnection {
     console.log("In onOpen", evt);
   }
   onMessage(evt) {
-    console.log("In onMessage", evt);    
+    console.log("In onMessage", evt);
     if (evt.data != "Connection established.") {
+      console.log("onmessage" + evt.data);
       this.receivef(evt.data);
     }
   }

@@ -29,6 +29,7 @@ public class DiagramsEndpoint {
                 if (!session.equals(this.ownSession)) {
                     session.getBasicRemote().sendText(msg);
                 }
+                System.out.println("BACK"+msg);
                 logger.log(Level.INFO, "Sent: {0}", msg);
             }
         } catch (IOException e) {

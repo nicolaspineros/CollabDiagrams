@@ -26,14 +26,15 @@ class DiagramComponents extends React.Component {
         type: event.element.type
     }
     console.log(element);
-    });*/
+    });
 
     const MyLoggingPlugin = (eventBus) => {
         eventBus.on('element.changed', (event) => {
           console.log('element ', event.element, ' changed');
         });
       }
-    
+    */
+
     this.bpmnViewer.on("import.done", (event) => {
       const { error, warnings } = event;
 
@@ -45,6 +46,12 @@ class DiagramComponents extends React.Component {
 
       return this.handleShown(warnings);
     });
+
+    this.eventBus = this.bpmnViewer.get("eventBus");
+    console.log("Bus: "+this.eventBus);
+    this.eventBus.on("element.click", (event) => {
+        console.log(event.element);
+    })
 
     if (url) {
         console.log("Paso url");
@@ -171,6 +178,7 @@ class CollabConnection {
   }
 }
 
+/*
 class MyCustomPlugin {
 	
 	addIfNotExist (definition, varName, varDefault){
@@ -239,6 +247,7 @@ export default {
   __init__: [ 'MyCustomPlugin' ],
   MyCustomPlugin: [ 'type', MyCustomPlugin ]
 };
+*/
 
 ReactDOM.render(
   <DiagramComponents url="js/diagram.bpmn" />,

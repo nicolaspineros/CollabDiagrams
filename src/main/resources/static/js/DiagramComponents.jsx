@@ -3,8 +3,9 @@ class DiagramComponents extends React.Component {
     super(props);
     this.collabWS = new CollabConnection(CollabServiceURL(), (msg) => {
       //var obj = JSON.parse(msg);
-      console.log("On func call back ", msg);
-      this.drawComponent(msg);                 
+      console.log("On func call back ",msg);
+      console.log(msg.x);      
+      //this.drawComponent(obj.type,obj.x,obj.y,obj.id);                 
     });
     this.state = {};
     console.log(this.state);
@@ -62,46 +63,63 @@ class DiagramComponents extends React.Component {
   }
 
   controladorEventos(){
-    this.eventBus = this.bpmnViewer.get("eventBus");
+    /* this.eventBus = this.bpmnViewer.get("eventBus");
     console.log("Bus: "+this.eventBus);
     var events = [      
       'element.click',
       'element.dblclick',
       'element.mousedown',
       'element.mouseup'
-    ];
+    ]; */
+
+    this.bpmnViewer.on('selection.changed', (e) => {
+        console.log(e);        
+        if(e.newSelection[0] != undefined){
+            console.log(e.newSelection[0]);            
+            let element = {
+                id: e.newSelection[0].id,
+                type: e.newSelection[0].type,
+                x: e.newSelection[0].x,
+                y: e.newSelection[0].y
+            }
+            this.collabWS.send(element);
+        }        
+    });
+    /*
     this.eventBus.on(events, (event) => {
-        console.log(event.element);
-        console.log("id" + event.element.id);        
+        console.log(event.element);        
         console.log(event.element.x);
         console.log(event.element.type);
-        this.collabWS.send(event);
+        this.collabWS.send(event.element);
     })
+*/
   }
 
-  drawComponent(component){  
-    console.log("Draw Component");    
-    console.log(component.element.type);
-    console.log(component.element.x);
+  drawComponent(id,type,x,y){  
+    console.log("Draw Component");
+    console.log(id)    
+    console.log(type);
+    console.log(x);
+    console.log(y);
     const bpmnFactory = this.bpmnViewer.get('bpmnFactory'),
           elementFactory = this.bpmnViewer.get('elementFactory'),
           elementRegistry = this.bpmnViewer.get('elementRegistry'),
           modeling = this.bpmnViewer.get('modeling');
     
-    
-    
-    const serviceTask = elementFactory.createShape({ type: component.type });
+    /* const attrs = {
+        type: 'bpmn:BoundaryEvent',
+        eventDefinitionType: 'bpmn:TimerEventDefinition'
+    };
 
-    modeling.appendShape(serviceTask, { x: component.x, y: component.y }, process);
-        
+    const position = {
+        x: component.element.x + component.element.width,
+        y: component.element.y + component.element.height
+      };
+
+    modeling.createShape(attrs, position, component, { attach: true });
+         */
   }
 
-  enviarEvento(event){
-    this.eventBus.on(event, (e) => {
-      console.log(e.element.id);
-      this.collabWS.send(e.element)
-    })
-  }  
 
   displayDiagram(diagramXML) {
     //this.collabWS.send(diagramXML);
@@ -176,15 +194,16 @@ class CollabConnection {
   onMessage(evt) {
     console.log("In onMessage", evt);
     if (evt.data != "Connection established.") {
-      console.log("onmessage" + evt.data);
+      console.log("onmessage", evt.data);
       this.receivef(evt.data);
     }
   }
   onError(evt) {
     console.error("In onError", evt);
   }
-  send(diagram) {
-    let msg = diagram;
+  send(element) {
+    //let msg = '{ "id":' + (element.id) + ',"type":' + (element.type) + ',"x":' + (element.x) + ',"y": ' + (element.y) +"}";
+    let msg = element;
     console.log("sending: ", msg);
     this.wsocket.send(msg);
   }

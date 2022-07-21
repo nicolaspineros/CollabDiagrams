@@ -74,7 +74,8 @@ class DiagramComponents extends React.Component {
     this.bpmnViewer.on('selection.changed', (e) => {
         console.log(e);        
         if(e.newSelection[0] != undefined){
-            console.log(e.newSelection[0]);            
+            console.log(e.newSelection[0]);
+            console.log(e.oldSelection[0]);            
             let element = {
                 id: e.newSelection[0].id,
                 type: e.newSelection[0].type,
@@ -86,14 +87,7 @@ class DiagramComponents extends React.Component {
             this.collabWS.send(element);
         }        
     });
-    /*
-    this.eventBus.on(events, (event) => {
-        console.log(event.element);        
-        console.log(event.element.x);
-        console.log(event.element.type);
-        this.collabWS.send(event.element);
-    })
-*/
+
   }
 
   drawComponent(component){  
@@ -107,8 +101,8 @@ class DiagramComponents extends React.Component {
           elementRegistry = this.bpmnViewer.get('elementRegistry'),
           modeling = this.bpmnViewer.get('modeling');
 
-    const process = elementRegistry.get('Process_1'),
-          startEvent = elementRegistry.get('StartEvent_1');    
+    const process = elementRegistry.get('Process_1')
+    var startEvent = elementRegistry.get('StartEvent_1');    
     
     const position = {
         x: component.x + component.width,
@@ -126,6 +120,8 @@ class DiagramComponents extends React.Component {
     //const boundaryEvent = elementFactory.createShape({ type: 'bpmn:BoundaryEvent' });
     
     modeling.createShape(componentType,{x: component.x, y: component.y}, serviceTask);
+
+    startEvent = serviceTask;
             
   }
 
@@ -182,7 +178,7 @@ class DiagramComponents extends React.Component {
 
 function CollabServiceURL() {
   var host = window.location.host;
-  var url = "wss://" + host + "/CollabService";
+  var url = "ws://" + host + "/CollabService";
   console.log("URL Calculada: " + url);
   return url;
 }

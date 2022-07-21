@@ -2,10 +2,9 @@ class DiagramComponents extends React.Component {
   constructor(props) {
     super(props);
     this.collabWS = new CollabConnection(CollabServiceURL(), (msg) => {
-      //var obj = JSON.parse(msg);
-      console.log("On func call back ",msg);
-      console.log(msg.x);      
-      //this.drawComponent(obj.type,obj.x,obj.y,obj.id);                 
+      var obj = JSON.parse(msg);
+      console.log("On func call back ",obj);          
+      this.drawComponent(obj);                 
     });
     this.state = {};
     console.log(this.state);
@@ -80,7 +79,9 @@ class DiagramComponents extends React.Component {
                 id: e.newSelection[0].id,
                 type: e.newSelection[0].type,
                 x: e.newSelection[0].x,
-                y: e.newSelection[0].y
+                y: e.newSelection[0].y,
+                height: e.height,
+                width: e.width
             }
             this.collabWS.send(element);
         }        
@@ -95,34 +96,47 @@ class DiagramComponents extends React.Component {
 */
   }
 
-  drawComponent(id,type,x,y){  
+  drawComponent(component){  
     console.log("Draw Component");
-    console.log(id)    
-    console.log(type);
-    console.log(x);
-    console.log(y);
+    console.log(component.id)    
+    console.log(component.type);
+    console.log(component.x);
+    console.log(component.y);
     const bpmnFactory = this.bpmnViewer.get('bpmnFactory'),
           elementFactory = this.bpmnViewer.get('elementFactory'),
           elementRegistry = this.bpmnViewer.get('elementRegistry'),
           modeling = this.bpmnViewer.get('modeling');
+
+    const process = elementRegistry.get('Process_1'),
+          startEvent = elementRegistry.get('StartEvent_1');    
     
-    /* const attrs = {
-        type: 'bpmn:BoundaryEvent',
-        eventDefinitionType: 'bpmn:TimerEventDefinition'
-    };
-
     const position = {
-        x: component.element.x + component.element.width,
-        y: component.element.y + component.element.height
-      };
+        x: component.x + component.width,
+        y: component.y + component.height
+    }; 
 
-    modeling.createShape(attrs, position, component, { attach: true });
-         */
+    console.log(position.x);
+    console.log(position.y);
+
+    var componentType = component.type;
+
+    // (3) Create a service task shape
+    const serviceTask = elementFactory.createShape({ type: componentType });
+
+    // (4) Add the new service task shape to the diagram using `appendShape` to connect it to an existing
+    // shape
+    modeling.appendShape(startEvent, serviceTask, {x: component.x, y: component.y}, process);
+
+    // (5) Create a boundary event shape
+    const boundaryEvent = elementFactory.createShape({ type: 'bpmn:BoundaryEvent' });
+
+    // (6) Add the new boundary event to the diagram attaching it to the service task
+    modeling.createShape({x: component.x, y: component.y}, serviceTask, { attach: true });
+            
   }
 
 
-  displayDiagram(diagramXML) {
-    //this.collabWS.send(diagramXML);
+  displayDiagram(diagramXML) {    
     console.log("Uso displayDiagram")
     this.bpmnViewer.importXML(diagramXML);
   }
@@ -202,8 +216,8 @@ class CollabConnection {
     console.error("In onError", evt);
   }
   send(element) {
-    //let msg = '{ "id":' + (element.id) + ',"type":' + (element.type) + ',"x":' + (element.x) + ',"y": ' + (element.y) +"}";
-    let msg = element;
+    let msg = JSON.stringify(element);
+    console.log(msg.id);
     console.log("sending: ", msg);
     this.wsocket.send(msg);
   }

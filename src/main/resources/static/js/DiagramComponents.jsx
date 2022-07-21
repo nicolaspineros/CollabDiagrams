@@ -115,23 +115,17 @@ class DiagramComponents extends React.Component {
         y: component.y + component.height
     }; 
 
-    console.log(position.x);
-    console.log(position.y);
-
     var componentType = component.type;
 
-    // (3) Create a service task shape
+    console.log(componentType);
+
     const serviceTask = elementFactory.createShape({ type: componentType });
 
-    // (4) Add the new service task shape to the diagram using `appendShape` to connect it to an existing
-    // shape
-    modeling.appendShape(startEvent, serviceTask, {x: component.x, y: component.y}, process);
-
-    // (5) Create a boundary event shape
-    const boundaryEvent = elementFactory.createShape({ type: 'bpmn:BoundaryEvent' });
-
-    // (6) Add the new boundary event to the diagram attaching it to the service task
-    modeling.createShape({x: component.x, y: component.y}, serviceTask, { attach: true });
+    modeling.appendShape(startEvent,serviceTask, {x: component.x, y: component.y}, process);
+    
+    //const boundaryEvent = elementFactory.createShape({ type: 'bpmn:BoundaryEvent' });
+    
+    modeling.createShape(componentType,{x: component.x, y: component.y}, serviceTask);
             
   }
 

@@ -1,6 +1,7 @@
 class DiagramComponents extends React.Component {
   constructor(props) {
     super(props);
+    this.ids = [];
     this.collabWS = new CollabConnection(CollabServiceURL(), (msg) => {
       var obj = JSON.parse(msg);
       console.log("On func call back ",obj);          
@@ -8,10 +9,12 @@ class DiagramComponents extends React.Component {
       console.log(obj.type);      
       switch(obj.type){
         case 'shape.added':
-            console.log("SA");
+            console.log("SA");            
+            this.drawShape(obj.element);
             break;
         case 'shape.removed':
             console.log("SR");
+            this.delete(obj.element)
             break;
         case 'shape.move.end':
             console.log("SME");
@@ -25,7 +28,7 @@ class DiagramComponents extends React.Component {
   }
 
   componentDidMount() {
-    const { url, diagramXML } = this.props;    
+    const { url, diagramXML } = this.props;
 
     const container = this.containerRef.current;
 
@@ -45,7 +48,7 @@ class DiagramComponents extends React.Component {
 
     //this.controladorEventos();
     this.controlador();
-
+    
     if (url) {        
       return this.fetchDiagram(url);
     }
@@ -53,6 +56,7 @@ class DiagramComponents extends React.Component {
     if (diagramXML) {        
       return this.displayDiagram(diagramXML);
     }
+    
     
   }
 
@@ -65,7 +69,7 @@ class DiagramComponents extends React.Component {
     if (props.url !== prevProps.url) {            
       return this.fetchDiagram(props.url);
     }
-
+    
     const currentXML = props.diagramXML || state.diagramXML;
 
     const previousXML = prevProps.diagramXML || prevState.diagramXML;
@@ -75,15 +79,13 @@ class DiagramComponents extends React.Component {
     }
   }
 
-  controlador(){
-    const bpmnFactory = this.bpmnViewer.get('bpmnFactory'),
-        elementFactory = this.bpmnViewer.get('elementFactory'),
-        elementRegistry = this.bpmnViewer.get('elementRegistry'),
-        modeling = this.bpmnViewer.get('modeling');
-
-    this.bpmnViewer.on('shape.added', (sa) => {
-          console.log("SA",sa);                    
-          this.collabWS.send(sa);
+  controlador(){    
+    this.bpmnViewer.on('shape.added', (sa) => {    
+          console.log(this.ids);
+          console.log("SA",sa);
+          if(sa.element.type != 'label' && (!this.ids.includes(sa.element.id))){
+            this.collabWS.send(sa);
+          }                   
     })
     this.bpmnViewer.on('shape.removed', (sr) => {
         console.log("SR",sr);
@@ -97,6 +99,36 @@ class DiagramComponents extends React.Component {
         this.collabWS.send(sme);
     })
 
+  }
+
+  drawShape(obj){
+    const bpmnFactory = this.bpmnViewer.get('bpmnFactory'),
+        elementFactory = this.bpmnViewer.get('elementFactory'),
+        elementRegistry = this.bpmnViewer.get('elementRegistry'),
+        modeling = this.bpmnViewer.get('modeling'),
+        process = elementRegistry.get('Process_0sckl64');
+
+    const position = {
+        x: obj.x + obj.height/2,
+        y: obj.y + obj.width/2
+    }; 
+
+    var componentType = obj.type;
+    
+    const task = elementFactory.createShape({ type: componentType,
+                                                id: obj.id});
+    modeling.createShape(task,position,process);
+    this.ids.push(obj.id);
+
+  }
+
+  delete(obj){
+    var elementRegistry = this.bpmnViewer.get('elementRegistry'),
+    modeling = this.bpmnViewer.get('modeling');
+
+    var element = elementRegistry.get(obj.id);
+
+    modeling.removeElements([ element ]);
   }
 
   controladorEventos(){
@@ -141,7 +173,7 @@ class DiagramComponents extends React.Component {
           elementRegistry = this.bpmnViewer.get('elementRegistry'),
           modeling = this.bpmnViewer.get('modeling');
 
-    const process = elementRegistry.get('Process_0sckl64')
+    const process = elementRegistry.get('Process_0sckl64');
     var startEvent = elementRegistry.get('StartEvent_1');    
     
     const position = {

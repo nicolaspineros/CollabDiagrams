@@ -61,6 +61,20 @@ class DiagramComponents extends React.Component {
     }
   }
 
+  controlador(){
+    const bpmnFactory = this.bpmnViewer.get('bpmnFactory'),
+        elementFactory = this.bpmnViewer.get('elementFactory'),
+        elementRegistry = this.bpmnViewer.get('elementRegistry'),
+        modeling = this.bpmnViewer.get('modeling');
+
+      this.bpmnViewer.on('shape.added', (sa) => {
+          console.log("SA",sa);
+      })
+      this.bpmnViewer.on('shape.removed', (sr) => {
+        console.log("SR",sr);
+    })
+  }
+
   controladorEventos(){
     /* this.eventBus = this.bpmnViewer.get("eventBus");
     console.log("Bus: "+this.eventBus);
@@ -81,8 +95,8 @@ class DiagramComponents extends React.Component {
                 type: e.newSelection[0].type,
                 x: e.newSelection[0].x,
                 y: e.newSelection[0].y,
-                height: e.height,
-                width: e.width
+                height: e.newSelection[0].height,
+                width: e.newSelection[0].width
             }
             this.collabWS.send(element);
         }        
@@ -96,17 +110,19 @@ class DiagramComponents extends React.Component {
     console.log(component.type);
     console.log(component.x);
     console.log(component.y);
+    console.log(component.height);
+    console.log(component.width);
     const bpmnFactory = this.bpmnViewer.get('bpmnFactory'),
           elementFactory = this.bpmnViewer.get('elementFactory'),
           elementRegistry = this.bpmnViewer.get('elementRegistry'),
           modeling = this.bpmnViewer.get('modeling');
 
-    const process = elementRegistry.get('Process_1')
+    const process = elementRegistry.get('Process_0sckl64')
     var startEvent = elementRegistry.get('StartEvent_1');    
     
     const position = {
-        x: component.x + component.width,
-        y: component.y + component.height
+        x: component.x + component.height/2,
+        y: component.y + component.width/2
     }; 
 
     var componentType = component.type;
@@ -115,11 +131,11 @@ class DiagramComponents extends React.Component {
 
     const serviceTask = elementFactory.createShape({ type: componentType });
 
-    modeling.appendShape(startEvent,serviceTask, {x: component.x, y: component.y}, process);
+    modeling.appendShape(startEvent,serviceTask, position, process);
     
     //const boundaryEvent = elementFactory.createShape({ type: 'bpmn:BoundaryEvent' });
     
-    modeling.createShape(componentType,{x: component.x, y: component.y}, serviceTask);
+    modeling.createShape(componentType,position, serviceTask);
 
     startEvent = serviceTask;
             

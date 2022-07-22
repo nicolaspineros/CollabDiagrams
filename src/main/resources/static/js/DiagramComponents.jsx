@@ -4,10 +4,23 @@ class DiagramComponents extends React.Component {
     this.collabWS = new CollabConnection(CollabServiceURL(), (msg) => {
       var obj = JSON.parse(msg);
       console.log("On func call back ",obj);          
-      this.drawComponent(obj);                 
+      //this.drawComponent(obj); 
+      console.log(obj.type);      
+      switch(obj.type){
+        case 'shape.added':
+            console.log("SA");
+            break;
+        case 'shape.removed':
+            console.log("SR");
+            break;
+        case 'shape.move.end':
+            console.log("SME");
+            break;
+        default:
+            console.log("NA");
+      }              
     });
-    this.state = {};
-    console.log(this.state);
+    this.state = {};    
     this.containerRef = React.createRef();
   }
 
@@ -30,7 +43,8 @@ class DiagramComponents extends React.Component {
       return this.handleShown(warnings);
     });    
 
-    this.controladorEventos();
+    //this.controladorEventos();
+    this.controlador();
 
     if (url) {        
       return this.fetchDiagram(url);
@@ -67,12 +81,22 @@ class DiagramComponents extends React.Component {
         elementRegistry = this.bpmnViewer.get('elementRegistry'),
         modeling = this.bpmnViewer.get('modeling');
 
-      this.bpmnViewer.on('shape.added', (sa) => {
-          console.log("SA",sa);
-      })
-      this.bpmnViewer.on('shape.removed', (sr) => {
-        console.log("SR",sr);
+    this.bpmnViewer.on('shape.added', (sa) => {
+          console.log("SA",sa);                    
+          this.collabWS.send(sa);
     })
+    this.bpmnViewer.on('shape.removed', (sr) => {
+        console.log("SR",sr);
+        this.collabWS.send(sr);
+    })
+    this.bpmnViewer.on('shape.move.start', (sms) => {
+        console.log("sms",sms);
+    })
+    this.bpmnViewer.on('shape.move.end', (sme) => {
+        console.log("SME",sme);        
+        this.collabWS.send(sme);
+    })
+
   }
 
   controladorEventos(){
@@ -142,8 +166,7 @@ class DiagramComponents extends React.Component {
   }
 
 
-  displayDiagram(diagramXML) {    
-    console.log("Uso displayDiagram")
+  displayDiagram(diagramXML) {        
     this.bpmnViewer.importXML(diagramXML);
   }
 
@@ -222,8 +245,7 @@ class CollabConnection {
     console.error("In onError", evt);
   }
   send(element) {
-    let msg = JSON.stringify(element);
-    console.log(msg.id);
+    let msg = JSON.stringify(element);    
     console.log("sending: ", msg);
     this.wsocket.send(msg);
   }

@@ -10,7 +10,6 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/diagram").setViewName("diagram");
         registry.addViewController("/").setViewName("home");
-        registry.addViewController("https://shielded-springs-57727.herokuapp.com/").setViewName("home");
         registry.addViewController("/login").setViewName("login");
     }
 

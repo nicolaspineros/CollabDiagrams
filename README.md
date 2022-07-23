@@ -5,7 +5,7 @@
 
 ## Heroku
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://shielded-springs-57727.herokuapp.com/)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://floating-citadel-56563.herokuapp.com/)
 
 ## Resumen
 
@@ -26,3 +26,11 @@ Pero esta aplicacion no cuenta con la opcion de tener varios usuarios a la vez e
 ## Historias de Usuario
 
 [Historias de Usuario](https://tree.taiga.io/project/nicolaspineros-collabdiagrams/backlog)
+
+## Usuarios para pruebas
+
+|   Usuario     |   Contraseña  |
+| ------------- | ------------- |
+|    nicolas    |   admin       |
+|    daniel     |   user2       |
+|     juan      |   user3       |

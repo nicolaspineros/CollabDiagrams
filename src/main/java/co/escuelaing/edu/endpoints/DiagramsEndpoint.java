@@ -33,7 +33,7 @@ public class DiagramsEndpoint {
     /**
      * En este metodo verificamos que el mensaje que viaja por el socket no sea de nuestra propia sesion y se envia el mensaje
      * a todos los clientes conectados
-     * @param msg
+     * @param msg componente del diagrama que ha sido añadido o eliminado
      */
     public void send(String msg) {
         try {
@@ -103,7 +103,7 @@ public class DiagramsEndpoint {
     /**
      * Si ocurre un error se cierra la sesion y se notifica el error
      * @param session sesion que fallo en la conexion al websocket
-     * @param t
+     * @param t registro error
      */
     @OnError
     public void error(Session session, Throwable t) {

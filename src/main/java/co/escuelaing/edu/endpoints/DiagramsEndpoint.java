@@ -13,6 +13,9 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import org.springframework.stereotype.Component;
 
+import co.escuelaing.edu.DiagramContext;
+import co.escuelaing.edu.TicketRepository;
+
 /**
  * Esta clase lleva el registro concurrente de las sesiones conectadas al websocket y los mensajes o errores
  */
@@ -22,7 +25,10 @@ public class DiagramsEndpoint {
     private static final Logger logger = Logger.getLogger(DiagramsEndpoint.class.getName());
     
     static Queue<Session> queue = new ConcurrentLinkedQueue<>();
+
+    TicketRepository ticketRepo = (TicketRepository) DiagramContext.getApplicationContext().getBean("ticketRepository");
     Session ownSession = null;
+    private boolean accepted = false;
 
     /**
      * En este metodo verificamos que el mensaje que viaja por el socket no sea de nuestra propia sesion y se envia el mensaje
@@ -50,9 +56,22 @@ public class DiagramsEndpoint {
      */
     @OnMessage
     public void processDiagram(String message, Session session) {
-        System.out.println("Diagram received:" + message + ". From session: " +
+        if (accepted) {
+            System.out.println("Diagram received:" + message + ". From session: " +
                 session);
-        this.send(message);
+            this.send(message);
+        } else {
+            if (!accepted && ticketRepo.checkTicket(message)) {
+                accepted = true;
+            }else{
+                try {
+                    ownSession.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(DiagramsEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
     }
 
     /**

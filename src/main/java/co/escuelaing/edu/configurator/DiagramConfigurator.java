@@ -6,8 +6,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 @Configuration
-@EnableScheduling
 public class DiagramConfigurator {
+    
+    /** 
+     * @return ServerEndpointExporter
+     */
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();

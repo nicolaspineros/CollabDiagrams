@@ -1,5 +1,8 @@
 package co.escuelaing.edu.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -33,13 +36,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     @Override
     public UserDetailsService userDetailsService() {
+        List<UserDetails> users = new ArrayList<>();
         UserDetails user =
                 User.withDefaultPasswordEncoder()
                         .username("nicolas")
                         .password("admin")
                         .roles("USER")
                         .build();
+        users.add(user);
 
-        return new InMemoryUserDetailsManager(user);
+        UserDetails user2 =
+                User.withDefaultPasswordEncoder()
+                        .username("daniel")
+                        .password("user2")
+                        .roles("USER")
+                        .build();
+
+        users.add(user2);
+
+        UserDetails user3 =
+                User.withDefaultPasswordEncoder()
+                        .username("juan")
+                        .password("user3")
+                        .roles("USER")
+                        .build();
+
+        users.add(user3);
+
+        return new InMemoryUserDetailsManager(users);
     }
 }

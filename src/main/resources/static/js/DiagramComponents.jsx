@@ -6,14 +6,14 @@ class DiagramComponents extends React.Component {
       var obj = JSON.parse(msg);
       console.log("On func call back ",obj);          
       //this.drawComponent(obj); 
-      console.log(obj.type);      
+      //console.log(obj.type);      
       switch(obj.type){
         case 'shape.added':
-            console.log("SA");            
+            //console.log("SA");            
             this.drawShape(obj.element);
             break;
         case 'shape.removed':
-            console.log("SR");
+            //console.log("SR");
             this.delete(obj.element)
             break;
         case 'shape.move.end':
@@ -80,8 +80,8 @@ class DiagramComponents extends React.Component {
 
   controlador(){    
     this.bpmnViewer.on('shape.added', (sa) => {    
-          console.log(this.ids);
-          console.log("SA",sa);
+          //console.log(this.ids);
+          //console.log("SA",sa);
           if(!this.ids.includes(sa.element.id)){
             this.collabWS.send(sa);
           }                   
@@ -129,73 +129,6 @@ class DiagramComponents extends React.Component {
 
     modeling.removeElements([ element ]);
   }
-
-  controladorEventos(){
-    /* this.eventBus = this.bpmnViewer.get("eventBus");
-    console.log("Bus: "+this.eventBus);
-    var events = [      
-      'element.click',
-      'element.dblclick',
-      'element.mousedown',
-      'element.mouseup'
-    ]; */
-
-    this.bpmnViewer.on('selection.changed', (e) => {
-        console.log(e);        
-        if(e.newSelection[0] != undefined){
-            console.log(e.newSelection[0]);
-            console.log(e.oldSelection[0]);            
-            let element = {
-                id: e.newSelection[0].id,
-                type: e.newSelection[0].type,
-                x: e.newSelection[0].x,
-                y: e.newSelection[0].y,
-                height: e.newSelection[0].height,
-                width: e.newSelection[0].width
-            }
-            this.collabWS.send(element);
-        }        
-    });
-
-  }
-
-  drawComponent(component){  
-    console.log("Draw Component");
-    console.log(component.id)    
-    console.log(component.type);
-    console.log(component.x);
-    console.log(component.y);
-    console.log(component.height);
-    console.log(component.width);
-    const bpmnFactory = this.bpmnViewer.get('bpmnFactory'),
-          elementFactory = this.bpmnViewer.get('elementFactory'),
-          elementRegistry = this.bpmnViewer.get('elementRegistry'),
-          modeling = this.bpmnViewer.get('modeling');
-
-    const process = elementRegistry.get('Process_0sckl64');
-    var startEvent = elementRegistry.get('StartEvent_1');    
-    
-    const position = {
-        x: component.x + component.height/2,
-        y: component.y + component.width/2
-    }; 
-
-    var componentType = component.type;
-
-    console.log(componentType);
-
-    const serviceTask = elementFactory.createShape({ type: componentType });
-
-    modeling.appendShape(startEvent,serviceTask, position, process);
-    
-    //const boundaryEvent = elementFactory.createShape({ type: 'bpmn:BoundaryEvent' });
-    
-    modeling.createShape(componentType,position, serviceTask);
-
-    startEvent = serviceTask;
-            
-  }
-
 
   displayDiagram(diagramXML) {        
     this.bpmnViewer.importXML(diagramXML);

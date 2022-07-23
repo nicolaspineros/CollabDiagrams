@@ -237,11 +237,14 @@ class DiagramComponents extends React.Component {
   }
 
   render() {
+    
     return (
       <div
         className="react-bpmn-diagram-container"
-        ref={this.containerRef}
-      ></div>
+        ref={this.containerRef}>
+          
+      </div>
+      
     );
   }
 }
@@ -286,7 +289,7 @@ class CollabConnection {
 }
 
 
-ReactDOM.render(
-  <DiagramComponents url="js/diagram.bpmn" />,
+ReactDOM.render(    
+    <DiagramComponents url="js/diagram.bpmn" />,
   document.getElementById("root")
 );

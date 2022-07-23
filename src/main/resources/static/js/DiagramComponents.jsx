@@ -57,7 +57,6 @@ class DiagramComponents extends React.Component {
       return this.displayDiagram(diagramXML);
     }
     
-    
   }
 
   componentWillUnmount() {
@@ -83,7 +82,7 @@ class DiagramComponents extends React.Component {
     this.bpmnViewer.on('shape.added', (sa) => {    
           console.log(this.ids);
           console.log("SA",sa);
-          if(sa.element.type != 'label' && (!this.ids.includes(sa.element.id))){
+          if(!this.ids.includes(sa.element.id)){
             this.collabWS.send(sa);
           }                   
     })
@@ -248,10 +247,13 @@ class DiagramComponents extends React.Component {
 }
 
 function CollabServiceURL() {
-  var host = window.location.host;
-  var url = "ws://" + host + "/CollabService";
-  console.log("URL Calculada: " + url);
-  return url;
+    var host = window.location.host;
+    var url = 'wss://' + (host);
+    if(host.startsWith('localhost')){
+        url = 'ws://' + (host) + '/CollabService';
+    }
+    console.log("host URL Calculada: " + url);
+    return url;
 }
 
 class CollabConnection {

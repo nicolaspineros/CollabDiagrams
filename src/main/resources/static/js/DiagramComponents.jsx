@@ -1,12 +1,21 @@
+/**
+ * Clase del componente principal de la aplicación
+ */
 class DiagramComponents extends React.Component {
   constructor(props) {
     super(props);
     this.ids = [];
+    /**
+     * this.collabWS sera la representacion del socket
+     */
     this.collabWS = new CollabConnection(CollabServiceURL(), (msg) => {
       var obj = JSON.parse(msg);
       console.log("On func call back ",obj);          
       //this.drawComponent(obj); 
-      //console.log(obj.type);      
+      //console.log(obj.type);
+      /**
+       * segun el tipo de objeto se realiza la accion de añadir, eliminar o mover el elemento
+       *  */     
       switch(obj.type){
         case 'shape.added':
             //console.log("SA");            
@@ -32,8 +41,14 @@ class DiagramComponents extends React.Component {
 
     const container = this.containerRef.current;
 
+    /**
+     * this.bpmnViewer representa el modulo de bpmn
+     */
     this.bpmnViewer = new BpmnJS({ container });
 
+    /**
+     * una vez se carga el modulo se obtiene el canvas a editar
+     */
     this.bpmnViewer.on("import.done", (event) => {
       const { error, warnings } = event;
 
@@ -46,7 +61,6 @@ class DiagramComponents extends React.Component {
       return this.handleShown(warnings);
     });    
 
-    //this.controladorEventos();
     this.controlador();
     
     if (url) {        
@@ -78,6 +92,10 @@ class DiagramComponents extends React.Component {
     }
   }
 
+  /**
+   * metodo que usa el modulo bpmn para identificar los cambios
+   * envia los cambios al websocket
+   */
   controlador(){    
     this.bpmnViewer.on('shape.added', (sa) => {    
           //console.log(this.ids);
@@ -203,6 +221,8 @@ class CollabConnection {
   }
   onMessage(evt) {
     console.log("In onMessage", evt);
+    // Este if permite que el primer mensaje del servidor no se tenga en cuenta.
+    // El primer mensaje solo confirma que se estableció la conexión.
     if (evt.data != "Connection established.") {
       console.log("onmessage", evt.data);
       this.receivef(evt.data);

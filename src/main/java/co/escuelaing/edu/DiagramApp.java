@@ -5,6 +5,11 @@ import java.util.Collections;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * Clase principal desde donde se corre la aplicacion
+ * @author: Nicolas Piñeros
+ */
+
 @SpringBootApplication
 public class DiagramApp {
     public static void main(String[] args) {

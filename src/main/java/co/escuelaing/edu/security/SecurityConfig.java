@@ -14,6 +14,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+/**
+ * Clase de configuracion de seguridad de usuarios y de rutas autorizadas
+ */
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -33,6 +37,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 
     }   
 
+    /**
+     * Metodo de asignación de nombre de usuario y contraseña
+     * @return el o los usuarios registrados
+     */
     @Bean
     @Override
     public UserDetailsService userDetailsService() {

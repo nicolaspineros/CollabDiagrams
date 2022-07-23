@@ -248,9 +248,9 @@ class DiagramComponents extends React.Component {
 
 function CollabServiceURL() {
     var host = window.location.host;
-    var url = 'wss://' + (host);
+    var url = 'wss://' + (host) + '/ColabService';
     if(host.startsWith('localhost')){
-        url = 'ws://' + (host) + '/CollabService';
+        url = 'ws://' + (host) + '/ColabService';
     }
     console.log("host URL Calculada: " + url);
     return url;
